@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">GNSS Analyzer Plus</string>
+    <string name="app_bar_title">GNSS Analyzer</string>
+    <string name="title_permission">Need Location and Internet permissions</string>
+    <string name="text_permission">GNSS Analyzer requires location and internet permission to work</string>
+    <string name="ok">OK</string>
+    <string name="exit">EXIT</string>
+    <string name="gps_not_supported">GPS Provider not supported on this device</string>
+    <string name="tv_latitude_label">Lat:</string>
+    <string name="tv_longitude_label">Lon:</string>
+    <string name="tv_date_label">Date:</string>
+    <string name="tv_time_label">Time:</string>
+    <string name="tv_ttff_label">TTFF(secs):</string>
+    <string name="tv_error_label">Errors(m):</string>
+    <string name="tv_speed_label">Speed(m/s):</string>
+    <string name="tv_altitude_label">Altitude(m):</string>
+</resources>
