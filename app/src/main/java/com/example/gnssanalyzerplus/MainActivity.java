@@ -1,13 +1,10 @@
 package com.example.gnssanalyzerplus;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -15,20 +12,21 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.PowerManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
+
+
 import com.example.gnssanalyzerplus.utils.PermissionUtils;
+
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -65,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Manifest.permission.WAKE_LOCK
     };
 
-    public static final int REQUEST_CODE = 1;
+    final int REQUEST_CODE = 1;
+
+    final int OFF_SCREEN_LIMIT = 2;
 
     private LocationManager mLocationManager;
 
@@ -77,6 +77,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     final float MIN_DISTANCE = 0;
 
+    private GnssMeasurementsEvent.Callback mGnssMeasurementListener;
+
+    private GnssMeasurementsEvent mGnssMeasurementEvent;
+
     private GnssStatus.Callback mGnssStatusListener;
 
     private GnssStatus mGnssStatus;
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private PowerManager.WakeLock mWakeLock;
 
-    private PowerManager mPowerManager;
+    PowerManager mPowerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // Adapter setup and configure tab layout icons
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(OFF_SCREEN_LIMIT);
         tabLayout.setupWithViewPager(viewPager);
         configTabIcons();
 
@@ -134,6 +139,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onPause();
 
         removeStatusListener();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            removeGnssStatusListener();
     }
 
     @Override
@@ -144,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             mWakeLock.release();
             Log.d(TAG, "wake lock released");
         }
+        gpsStop();
     }
 
     @Override
@@ -164,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-    private void requestPermissionAndInit(final Activity activity) {
+    private void requestPermissionAndInit(final AppCompatActivity activity) {
         if(PermissionUtils.hasGrantedPermissions(activity, REQUIRED_PERMISSIONS)) {
             init();
         } else {
@@ -175,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void init() {
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakeLock");
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "MyApp::MyWakeLock");
         if(!mWakeLock.isHeld()) {
             mWakeLock.acquire();
             Log.d(TAG, "wake lock acquired");
@@ -191,6 +200,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         gpsStart();
         addStatusListener();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            addMeasurementListener();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private void addMeasurementListener() {
+        mGnssMeasurementListener = new GnssMeasurementsEvent.Callback() {
+            @Override
+            public void onGnssMeasurementsReceived(GnssMeasurementsEvent eventArgs) {
+                for(GnssListener listener: mGnssListeners) {
+                    listener.onGnssMeasurementsReceived(eventArgs);
+                }
+            }
+
+            @Override
+            public void onStatusChanged(int status) {
+                super.onStatusChanged(status);
+            }
+        };
+
+        mLocationManager.registerGnssMeasurementsCallback(mGnssMeasurementListener);
     }
 
     private void addStatusListener() {
@@ -263,6 +293,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         };
 
         mLocationManager.addGpsStatusListener(mLegacyStatusListener);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private void removeMeasurementListener() {
+        if(mLocationManager != null) {
+            mLocationManager.unregisterGnssMeasurementsCallback(mGnssMeasurementListener);
+        }
     }
 
     private void removeStatusListener() {

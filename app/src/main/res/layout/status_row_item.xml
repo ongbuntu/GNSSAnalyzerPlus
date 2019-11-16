@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tv_svid"
+        android:layout_width="30dp"
+        android:layout_height="20dp"
+        android:textColor="@color/recyclerviewTextColor"
+        android:textSize="12sp"/>
+
+    <ImageView
+        android:id="@+id/iv_flag"
+        android:layout_width="40dp"
+        android:layout_height="20dp"/>
+
+    <TextView
+        android:id="@+id/tv_azimuth"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/recyclerviewTextColor"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_elevation"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/recyclerviewTextColor"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_cno"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/recyclerviewTextColor"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:max="55"
+        android:progress="0"
+        android:scaleY="3.5"
+        android:scrollbarSize="4dp" />
+
+
+</LinearLayout>
