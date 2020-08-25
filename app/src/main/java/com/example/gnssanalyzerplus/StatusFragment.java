@@ -288,7 +288,8 @@ public class StatusFragment extends Fragment implements GnssListener {
                 mAverageBeidouCno.setText(mRes.getString(R.string.average_cno_value, averageBeidouSnr, beidouCount));
                 mAverageGalileoCno.setText(mRes.getString(R.string.average_cno_value, averageGalileoSnr, galileoCount));
 
-                writeSnrToParseServer(averageGpsSnr, averageGlonassSnr, averageBeidouSnr, averageGalileoSnr);
+                writeSnrToParseServer(averageGpsSnr, averageGlonassSnr, averageBeidouSnr, averageGalileoSnr,
+                        gpsCount, glonassCount, beidouCount, galileoCount);
 
 
                 mCummulativeGpsSnr = 0;
@@ -421,7 +422,8 @@ public class StatusFragment extends Fragment implements GnssListener {
                 mAverageBeidouCno.setText(mRes.getString(R.string.average_cno_value, averageBeidouSnr, beidouCount));
                 mAverageGalileoCno.setText(mRes.getString(R.string.average_cno_value, averageGalileoSnr, galileoCount));
 
-                writeSnrToParseServer(averageGpsSnr, averageGlonassSnr, averageBeidouSnr, averageGalileoSnr);
+                writeSnrToParseServer(averageGpsSnr, averageGlonassSnr, averageBeidouSnr, averageGalileoSnr,
+                        gpsCount, glonassCount, beidouCount, galileoCount);
 
 
                 mCummulativeGpsSnr = 0;
@@ -441,21 +443,30 @@ public class StatusFragment extends Fragment implements GnssListener {
 
     }
 
-    private void writeSnrToParseServer(final float gps, final float glonass, final float beidou, final float galileo) {
+    private void writeSnrToParseServer(final float gps, final float glonass, final float beidou, final float galileo,
+                                       final int gpsCount, final int glonassCount, final int beidouCount, final int galileoCount) {
 
         mQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null) {
                     if(objects.size() >= 1) {
-                        if(!Double.isNaN(gps))
+                        if(!Double.isNaN(gps)) {
                             objects.get(0).put("gpsSnr", gps);
-                        if(!Double.isNaN(glonass))
+                            objects.get(0).put("gpsCount", gpsCount);
+                        }
+                        if(!Double.isNaN(glonass)) {
                             objects.get(0).put("glonassSnr", glonass);
-                        if(!Double.isNaN(beidou))
+                            objects.get(0).put("glonassCount", glonassCount);
+                        }
+                        if(!Double.isNaN(beidou)) {
                             objects.get(0).put("beidouSnr", beidou);
-                        if(!Double.isNaN(galileo))
+                            objects.get(0).put("beidouCount", beidouCount);
+                        }
+                        if(!Double.isNaN(galileo)) {
                             objects.get(0).put("galileoSnr", galileo);
+                            objects.get(0).put("galileoCount", galileoCount);
+                        }
                         objects.get(0).saveInBackground();
                     }
                 }

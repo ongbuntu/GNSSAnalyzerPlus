@@ -30,9 +30,9 @@ public class App extends Application {
         Parse.enableLocalDatastore(this);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("bdd2ff3e78544bf11e977e1d74f80071caa3a070")
-                .clientKey("90a9f48e9e36e6783d2cc41485dd9d3d1e855e42")
-                .server("http://ec2-52-77-219-242.ap-southeast-1.compute.amazonaws.com/parse")
+                .applicationId("myAppId")
+                .clientKey("myMasterKey")
+                .server("http://192.168.1.130:1337/parse/")
                 .build()
         );
 
@@ -81,6 +81,13 @@ public class App extends Application {
 //                .applicationId("myAppId")
 //                .clientKey("myMasterKey")
 //                .server("http://192.168.100.60:1337/parse/")
+//                .build()
+//        );
+
+//        Parse.initialize(new Parse.Configuration.Builder(this)
+//                .applicationId("bdd2ff3e78544bf11e977e1d74f80071caa3a070")
+//                .clientKey("90a9f48e9e36e6783d2cc41485dd9d3d1e855e42")
+//                .server("http://ec2-52-77-219-242.ap-southeast-1.compute.amazonaws.com/parse")
 //                .build()
 //        );
 
